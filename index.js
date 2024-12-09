@@ -21,6 +21,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
+  //gör så den funkar med nya sättet
   .then((res) => {
     console.log("Database Connected");
   })
