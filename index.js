@@ -17,10 +17,7 @@ app.use("/products", productRouter);
 
 // Connect to your own DB
 mongoose
-  .connect(process.env.DB_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.DB_URL)
   //gör så den funkar med nya sättet
   .then((res) => {
     console.log("Database Connected");
