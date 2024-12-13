@@ -20,8 +20,8 @@ router.get("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   const product_id = req.params.id;
-
-  try {
+ 
+  try { 
     res.json(await Product.findById(product_id));
   } catch (error) {
     res.json({ message: error });

@@ -66,7 +66,7 @@ getProducts();
 
 function mapToProductSchema(rawData) {
   // combine category path
-  const category = rawData.mainCategoryPath && rawData.mainCategoryPath[1];
+ 
 
   return {
     webhallen_id: String(rawData.id),
@@ -74,13 +74,8 @@ function mapToProductSchema(rawData) {
     description: rawData.subTitle || "No description available", // Fallback to default if missing
     price: parseFloat(rawData.price?.price), // Convert price to float
     stock: rawData.stock?.web || 0, // Default to 0 if stock info is missing
-    categories: category
-      ? `${category.id}-${category.name.replace(/\s+/g, "-")}` // Format category as "id-name"
-      : "",
-    image:
-      rawData.splashes && rawData.splashes.length > 0
-        ? rawData.splashes[0].imageSource
-        : null, // Safe access
+    categories: rawData.section.name,
+    image: `https://cdn.webhallen.com/images/product/${rawData.id}`,
   };
 }
 
@@ -91,7 +86,7 @@ async function saveProductIfNotExist(productData) {
     const existingProduct = await Product.exists({
       webhallen_id: productData.webhallen_id,
     });
-    console.log(existingProduct);
+   
 
     if (existingProduct) {
       console.log(
