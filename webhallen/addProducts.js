@@ -5,9 +5,8 @@ const fs = require("fs").promises;
 
 mongoose
   .connect(
-    process.env.DB_URL ||
-      "mongodb+srv://TmRAaEx:Malinpersson04@cluster0.ufvdq.mongodb.net/shop?retryWrites=true&w=majority&appName=Cluster0"
-  )
+    process.env.DB_URL
+  ) //only gets ran localy
   //gör så den funkar med nya sättet
   .then((res) => {
     console.log("Database Connected");
