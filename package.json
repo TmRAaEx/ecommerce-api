@@ -13,6 +13,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.17.1",
+    "fs": "^0.0.1-security",
     "helmet": "^6.0.1",
     "mongoose": "^8.8.4",
     "nodemon": "^2.0.6"
