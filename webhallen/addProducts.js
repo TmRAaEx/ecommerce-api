@@ -46,7 +46,7 @@ async function get(url = "") {
     return await response.json();
   }
 }
-// Delay function that returns a promise and resolves after a given time
+// Delay function too stop api rate limiter
 function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -74,8 +74,8 @@ async function getProducts(idFromJSON, categoryName) {
       allProducts = allProducts.concat(products);
 
       // Increment to the next page
+      delay(3000) //delay to stop api rate limiter
       currentPage++;
-      delay(2000) //delay to stop api rate limiter
 
     }
 
@@ -129,6 +129,7 @@ function mapToProductSchema(rawData, mainCategory) {
   return {
     webhallen_id: String(rawData.id),
     name: rawData.name,
+    rating:rawData.averageRating?.rating || "0",
     description: rawData.subTitle || "No description available", // Fallback to default if missing
     price: parseFloat(rawData.price?.price), // Convert price to float
     stock: rawData.stock?.web || 0, // Default to 0 if stock info is missing
