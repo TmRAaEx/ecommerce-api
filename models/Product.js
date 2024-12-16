@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-
-const ProductSchema = mongoose.Schema({
+const { Schema } = mongoose;
+const ProductSchema = Schema({
   webhallen_id: {
     type: String,
     required: true,
@@ -9,9 +9,9 @@ const ProductSchema = mongoose.Schema({
     type: String,
     required: true,
   },
-  description: {
+  subTitle: {
     type: String,
-    required: true,
+    required: false,
   },
   price: {
     type: mongoose.Schema.Types.Decimal128,
@@ -29,14 +29,19 @@ const ProductSchema = mongoose.Schema({
     type: String,
     required: false,
   },
-  image: {
-    type: String,
-    required: false,
+  images: {
+    type: Array,
+    required: true,
   },
   date: {
     type: Date,
     default: Date.now,
   },
+  data: {
+    type: Schema.Types.Mixed,
+    required: true,
+  },
+  thumbNail: { type: String, required: true },
 });
 
 module.exports = mongoose.model("Products", ProductSchema);

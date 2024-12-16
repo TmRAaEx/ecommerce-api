@@ -4,9 +4,7 @@ require("dotenv").config();
 const fs = require("fs").promises;
 
 mongoose
-  .connect(
-    process.env.DB_URL
-  ) //only gets ran localy
+  .connect(process.env.DB_URL) //only gets ran localy
   //gör så den funkar med nya sättet
   .then((res) => {
     console.log("Database Connected");
@@ -40,6 +38,9 @@ async function get(url = "") {
     referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
   });
   if (response.status >= 400) {
+    if (response.status === 404) {
+      return;
+    }
     console.log("Bad response from server " + url + " " + response.status);
     return get(url);
   } else {
@@ -48,7 +49,7 @@ async function get(url = "") {
 }
 // Delay function too stop api rate limiter
 function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 // Function to fetch products for a given ID and category name
 async function getProducts(idFromJSON, categoryName) {
@@ -59,11 +60,10 @@ async function getProducts(idFromJSON, categoryName) {
 
     // Loop through pages until no more products are returned
     while (true) {
-       const url = `${baseUrl}${currentPage}&touchpoint=DESKTOP&totalProductCountSet=false`;
+      const url = `${baseUrl}${currentPage}&touchpoint=DESKTOP&totalProductCountSet=false`;
 
       const { products } = await get(url); // Fetch products from API
 
-    
       // If no products are returned, break out of the loop
       if (products.length === 0) {
         console.log(`No products found on page ${currentPage}. Stopping.`);
@@ -74,19 +74,24 @@ async function getProducts(idFromJSON, categoryName) {
       allProducts = allProducts.concat(products);
 
       // Increment to the next page
-      delay(3000) //delay to stop api rate limiter
+      delay(3000); //delay to stop api rate limiter
       currentPage++;
-
     }
 
     // After fetching all pages, process the products
     for (const product of allProducts) {
-      const mappedData = mapToProductSchema(
-        product,
-        categoryName.split("/")[0] // Only want the main category
+      const product_data = await get(
+        `https://www.webhallen.com/api/product/${product.id}?touchpoint=DESKTOP`
       );
-
-      saveProductIfNotExist(mappedData);
+      if (product_data) {
+        const mappedData = mapToProductSchema(
+          product_data.product,
+          categoryName.split("/")[0] // Only want the main category
+        );
+        saveProductIfNotExist(mappedData);
+      }
+      
+      delay(3000); //delay to stop api rate limiter
     }
 
     console.log(
@@ -100,22 +105,20 @@ async function getProducts(idFromJSON, categoryName) {
   }
 }
 
-
 // Main function to tie everything together
 async function main() {
   try {
     const jsonData = await getJSONData(); // Read JSON data
-    
+
     // Loop through keys (IDs) and values (category names) in the JSON file
     for (const [id, categoryName] of Object.entries(jsonData)) {
       console.log(`Fetching products for category${categoryName}`);
-      
+
       await getProducts(id, categoryName); // Fetch products
     }
   } catch (err) {
     console.error("Error in main function:", err);
   } finally {
-    
     console.log("Finished processing all categories. Exiting program...");
     process.exit(0); // Exit the program after all work is finished
   }
@@ -124,17 +127,18 @@ async function main() {
 // Calling main function
 main();
 
-
 function mapToProductSchema(rawData, mainCategory) {
   return {
     webhallen_id: String(rawData.id),
     name: rawData.name,
-    rating:rawData.averageRating?.rating || "0",
-    description: rawData.subTitle || "No description available", // Fallback to default if missing
+    rating: rawData.averageRating?.rating || "0",
+    subTitle: rawData.subTitle || null, // Fallback to default if missing
     price: parseFloat(rawData.price?.price), // Convert price to float
     stock: rawData.stock?.web || 0, // Default to 0 if stock info is missing
     categories: mainCategory,
-    image: `https://cdn.webhallen.com/images/product/${rawData.id}`,
+    images: rawData.images,
+    data: rawData.data,
+    thumbNail: `https://cdn.webhallen.com${rawData.images[0].large}&w=500`,
   };
 }
 
