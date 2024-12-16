@@ -20,7 +20,8 @@ app.use('/search', searchRouter);
 // Connect to your own DB
 mongoose
 	.connect(process.env.DB_URL)
-	//gör så den funkar med nya sättet
+
+	//----gör så den funkar med nya sättet i mongoose----
 	.then((res) => {
 		console.log('Database Connected');
 	})
