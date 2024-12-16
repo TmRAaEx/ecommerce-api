@@ -17,6 +17,10 @@ app.use('/products', productRouter);
 
 const searchRouter = require('./routes/search');
 app.use('/search', searchRouter);
+
+const categoryRouter = require('./routes/categories');
+app.use('/categories', categoryRouter);
+
 // Connect to your own DB
 mongoose
 	.connect(process.env.DB_URL)
@@ -28,5 +32,6 @@ mongoose
 	.catch((error) => {
 		console.error(error);
 	});
+
 // Listen to server
-app.listen(process.env.PORT || 5000); //Listen through port 5000
+app.listen(process.env.PORT || 5001); //Listen through port 5000
