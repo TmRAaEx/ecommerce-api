@@ -38,10 +38,14 @@ const ProductSchema = Schema({
     default: Date.now,
   },
   data: {
-    type: Schema.Types.Mixed,
+    type: Array,
     required: true,
   },
   thumbNail: { type: String, required: true },
+  hot: {
+    type: Number,
+    required: false,
+  },
 });
 
 module.exports = mongoose.model("Products", ProductSchema);

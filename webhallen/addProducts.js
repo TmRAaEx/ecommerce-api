@@ -90,7 +90,7 @@ async function getProducts(idFromJSON, categoryName) {
         );
         saveProductIfNotExist(mappedData);
       }
-      
+
       delay(3000); //delay to stop api rate limiter
     }
 
@@ -137,9 +137,41 @@ function mapToProductSchema(rawData, mainCategory) {
     stock: rawData.stock?.web || 0, // Default to 0 if stock info is missing
     categories: mainCategory,
     images: rawData.images,
-    data: rawData.data,
+    data: restructureDataObject(rawData.data),
     thumbNail: `https://cdn.webhallen.com${rawData.images[0].large}&w=500`,
+    hot: assignHotValue(),
   };
+}
+
+function restructureDataObject(data) {
+  const result = []; // Initialize list of objects
+
+  for (const categoryKey in data) {
+    if (data.hasOwnProperty(categoryKey)) {
+      const category = data[categoryKey]; // get the title of the product specs
+      const attributes = []; // Llist of specs under each category
+
+      for (const subKey in category) {
+        if (category.hasOwnProperty(subKey)) {
+          const { name, value } = category[subKey]; // get name and value
+          attributes.push({ name, value }); // add to list
+        }
+      }
+
+      // add to the list
+      result.push({
+        category: categoryKey,
+        attributes: attributes,
+      });
+    }
+  }
+
+  return result;
+}
+//randomly generate a "hot" value for products
+function assignHotValue() {
+  const randomNumber = Math.floor(Math.random() * 100) + 1;
+  return randomNumber;
 }
 
 // Function to save a product only if it doesn't already exist
