@@ -9,7 +9,7 @@ router.get("/", async (req, res) => {
   const skip = (page - 1) * limit; //determines what page to show
   try {
     res.json(
-      await Product.find() //fetches all documents
+      await Product.find({ hot: { $gt: 80 } }) //fetches all documents
         .sort({ hot: -1 }) // sorts products on main page by "hot"
         .skip(skip) //skips unwanted documents
         .limit(limit) //returns documents based on the limit
