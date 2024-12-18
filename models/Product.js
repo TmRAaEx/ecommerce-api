@@ -46,6 +46,7 @@ const ProductSchema = Schema({
     type: Number,
     required: false,
   },
+  reviews: { type: Array, required: false },
 });
 
 module.exports = mongoose.model("Products", ProductSchema);
