@@ -83,9 +83,13 @@ async function getProducts(idFromJSON, categoryName) {
       const product_data = await get(
         `https://www.webhallen.com/api/product/${product.id}?touchpoint=DESKTOP`
       );
+      const { reviews } = await get(
+        `https://www.webhallen.com/api/reviews?products%5B0%5D=${product.id}&sortby=latest&page=1`
+      );
       if (product_data) {
         const mappedData = mapToProductSchema(
           product_data.product,
+          reviews,
           categoryName.split("/")[0] // Only want the main category
         );
         saveProductIfNotExist(mappedData);
@@ -127,7 +131,7 @@ async function main() {
 // Calling main function
 main();
 
-function mapToProductSchema(rawData, mainCategory) {
+function mapToProductSchema(rawData, reviews, mainCategory) {
   return {
     webhallen_id: String(rawData.id),
     name: rawData.name,
@@ -138,8 +142,9 @@ function mapToProductSchema(rawData, mainCategory) {
     categories: mainCategory,
     images: rawData.images,
     data: restructureDataObject(rawData.data),
-    thumbNail: `https://cdn.webhallen.com${rawData.images[0].large}&w=500`,
+    thumbNail: `https://cdn.webhallen.com${rawData.images[0].large}&w=250`,
     hot: assignHotValue(),
+    reviews: reviews,
   };
 }
 
